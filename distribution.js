@@ -1,27 +1,52 @@
 #!/usr/bin/env node
 
-const process = require('process');
+const util = require('./distribution/util/util.js');
+const args = require('yargs').argv;
 
-global.config = global.config || require('./distribution/local/config');
+// Default configuration
+global.nodeConfig = global.nodeConfig || {
+  ip: '127.0.0.1',
+  port: 8080,
+  onStart: () => {
+    console.log('Node started!');
+  },
+};
+
+/*
+    As a debugging tool, you can pass ip and port arguments directly.
+    This is just to allow for you to easily startup nodes from the terminal.
+
+    Usage:
+    ./distribution.js --ip '127.0.0.1' --port 1234
+  */
+if (args.ip) {
+  global.nodeConfig.ip = args.ip;
+}
+
+if (args.port) {
+  global.nodeConfig.port = parseInt(args.port);
+}
+
+if (args.config) {
+  let nodeConfig = util.deserialize(args.config);
+  global.nodeConfig.ip = nodeConfig.ip ? nodeConfig.ip : global.nodeConfig.ip;
+  global.nodeConfig.port = nodeConfig.port ?
+        nodeConfig.port : global.nodeConfig.port;
+  global.nodeConfig.onStart = nodeConfig.onStart ?
+        nodeConfig.onStart : global.nodeConfig.onStart;
+}
 
 const distribution = {
   util: require('./distribution/util/util.js'),
   local: require('./distribution/local/local.js'),
   node: require('./distribution/local/node.js'),
-  all: require('./distribution/all/all'),
 };
 
 global.distribution = distribution;
+
 module.exports = distribution;
 
 /* The following code is run when distribution.js is run directly */
 if (require.main === module) {
-  try {
-    distribution.node.start(() => {
-    /* Code that runs after your node has booted */
-    });
-  } catch (error) {
-    console.error(error);
-    process.exit(1);
-  }
+  distribution.node.start(global.nodeConfig.onStart);
 }

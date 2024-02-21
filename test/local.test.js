@@ -13,17 +13,18 @@ let lastPort = 8090;
 beforeEach(() => {
   jest.resetModules();
 
-  global.config = {
+  global.nodeConfig = {
     ip: '127.0.0.1',
     port: lastPort++, // Avoid port conflicts
   };
+
   distribution = require('../distribution');
   local = distribution.local;
 
   id = distribution.util.id;
   wire = distribution.util.wire;
 
-  node = global.config;
+  node = global.nodeConfig;
 
   routes = local.routes;
   comm = local.comm;

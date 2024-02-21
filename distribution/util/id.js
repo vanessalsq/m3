@@ -10,9 +10,8 @@ function getID(obj) {
 
 // The NID is the SHA256 hash of the JSON representation of the node
 function getNID(node) {
-  const hash = crypto.createHash('sha256');
-  hash.update(serialization.serialize(node));
-  return hash.digest('hex');
+  node = {ip: node.ip, port: node.port};
+  return getID(node);
 }
 
 // The SID is the first 5 characters of the NID
@@ -20,16 +19,10 @@ function getSID(node) {
   return getNID(node).substring(0, 5);
 }
 
-function getMID(message) {
-  let msg = {};
-  msg.date = new Date().getTime();
-  msg.mss = message;
-  return getID(message);
-}
+
 
 module.exports = {
   getNID: getNID,
   getSID: getSID,
   getID: getID,
-  getMID: getMID,
 };
