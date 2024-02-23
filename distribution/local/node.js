@@ -1,7 +1,8 @@
-/*
-    IMPORTANT: This is a copy of the node.js provided for M2; a new verion of this file will be provided in 48 hours. Therefore, all comments below refer to M2.
-*/
+const http = require('http');
+const url = require('url');
 
+let local = require('../local/local');
+const serialization = require('../util/serialization');
 
 /*
     The start function will be called to start your node.
@@ -10,12 +11,32 @@
 */
 
 
-const start = function(started) {
+function isValidBody(body) {
+  error = undefined;
+  if (body.length === 0) {
+    return new Error('No body');
+  }
+
+  try {
+    body = JSON.parse(body);
+  } catch (error) {
+    return error;
+  }
+
+  return error;
+}
+
+
+const start = function(onStart) {
   const server = http.createServer((req, res) => {
     /* Your server will be listening for PUT requests. */
 
     // Write some code...
 
+    if (req.method !== 'PUT') {
+      res.end(serialization.serialize(new Error('Method not allowed!')));
+      return;
+    }
 
     /*
       The path of the http request will determine the service to be used.
@@ -24,6 +45,13 @@ const start = function(started) {
 
 
     // Write some code...
+
+
+    const pathname = url.parse(req.url).pathname;
+    const [, service, method] = pathname.split('/');
+
+    console.log(`[SERVER] (${global.nodeConfig.ip}:${global.nodeConfig.port})
+        Request: ${service}:${method}`);
 
 
     /*
@@ -44,10 +72,37 @@ const start = function(started) {
     // Write some code...
 
 
+    let body = [];
+
+    req.on('data', (chunk) => {
+      body.push(chunk);
+    });
+
+    req.on('end', () => {
+      body = Buffer.concat(body).toString();
+
+      let error;
+
+      if (error = isValidBody(body)) {
+        res.end(serialization.serialize(error));
+        return;
+      }
+
+      body = JSON.parse(body);
+      body = serialization.deserialize(body);
+      let args = body;
+
+
       /* Here, you can handle the service requests. */
 
       // Write some code...
 
+      local.routes.get(service, (error, service) => {
+        if (error) {
+          res.end(serialization.serialize(error));
+          console.error(error);
+          return;
+        }
 
         /*
       Here, we provide a default callback which will be passed to services.
@@ -60,6 +115,13 @@ const start = function(started) {
 
         // Write some code...
 
+
+        console.log(`[SERVER] Args: ${JSON.stringify(args)} 
+            ServiceCallback: ${serviceCallback}`);
+
+        service[method](...args, serviceCallback);
+      });
+    });
   });
 
 
@@ -67,17 +129,16 @@ const start = function(started) {
 
   /*
     Your server will be listening on the port and ip specified in the config
-    You'll need to call the started callback when your server has successfully
+    You'll be calling the onStart callback when your server has successfully
     started.
 
-    In this milestone, you'll be passing the server object to this callback
-    so that we can close the server when we're done with it.
-    In future milestones, we'll add the abilitiy to stop the node
-    through the service interface.
+    In this milestone, we'll be adding the ability to stop a node
+    remotely through the service interface.
   */
 
-  server.listen(global.config.port, global.config.ip, () => {
-    started(server);
+  server.listen(global.nodeConfig.port, global.nodeConfig.ip, () => {
+    console.log(`Server running at http://${global.nodeConfig.ip}:${global.nodeConfig.port}/`);
+    onStart(server);
   });
 };
 
