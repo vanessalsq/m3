@@ -18,7 +18,7 @@ let comm = (config) => {
         Object.keys(nodes).forEach((nodeId) => {
           local.comm.send(
             message,
-            {node: nodeId, ...remote},
+            {node: nodes[nodeId], ...remote},
             (err, response) => {
               if (err) {
                 errors[nodeId] = err;

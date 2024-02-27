@@ -3,24 +3,24 @@ const local = require('../local/local');
 
 let status = (config) => {
   let context = {};
+  let sum;
 
-  context.gid = config.gid || 'all'; // contains a property named gid
+  context.gid = config.gid; // contains a property named gid
   return {
     get: (key, callback) => {
       const remote = {service: 'status', method: 'get'};
-      distribution[context.gid].comm.send([key, callback], remote, (e, res) => {
-        // local.status.get(key, callback); ??????????
+      distribution[context.gid].comm.send([key], remote, (e, res) => {
         if (e) {
           return callback(e, null);
         } else {
           if (key == 'heapTotal' || key == 'heapUsed') {
-            let sum;
             res.forEach((ele) => {
               sum += ele;
             });
-            return callback(null, sum);
+            return callback(null, sum * 2);
+          } else {
+            return callback(null, res);
           }
-          return callback(null, res);
         }
       });
     },
@@ -47,7 +47,7 @@ let status = (config) => {
     },
     stop: (callback) => {
       const remote = {service: 'status', method: 'stop'};
-      distribution[context.gid].comm.send(callback, remote, (e, res) => {
+      distribution[context.gid].comm.send([], remote, (e, res) => {
         if (e) {
           return callback(e, null);
         } else {
