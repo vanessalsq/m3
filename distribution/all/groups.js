@@ -10,16 +10,12 @@ let groups = (config) => {
     get: (groupName, callback) => {
       const remote = {service: 'groups', method: 'get', nodes: [groupName]};
 
-      distribution[context.gid].comm.send(
-        [groupName, callback],
-        remote,
-        (e, res) => {
-          if (e) {
-            return callback(e, null);
-          }
-          return callback(null, res);
-        },
-      );
+      distribution[context.gid].comm.send([groupName], remote, (e, res) => {
+        if (e) {
+          return callback(e, null);
+        }
+        return callback(null, res);
+      });
     },
 
     put: (groupName, groupData, callback) => {
@@ -28,23 +24,8 @@ let groups = (config) => {
         method: 'put',
       };
 
-      distribution[context.gid] = {};
-      distribution[context.gid].comm = require('./comm')({gid: context.gid});
-      distribution[context.gid].gossip = require('./gossip')({
-        gid: context.gid,
-      });
-      distribution[context.gid].groups = require('./groups')({
-        gid: context.gid,
-      });
-      distribution[context.gid].routes = require('./routes')({
-        gid: context.gid,
-      });
-      distribution[context.gid].status = require('./status')({
-        gid: context.gid,
-      });
-
       distribution[context.gid].comm.send(
-        [groupName, groupData, callback],
+        [groupName, groupData],
         remote,
         (e, res) => {
           if (e) {
@@ -64,7 +45,7 @@ let groups = (config) => {
       local.groups.add(context.gid, node, callback);
 
       distribution[context.gid].comm.send(
-        [groupName, node, callback],
+        [groupName, node],
         remote,
         (e, res) => {
           if (e) {
@@ -82,7 +63,7 @@ let groups = (config) => {
       };
 
       distribution[context.gid].comm.send(
-        [groupName, node, callback],
+        [groupName, node],
         remote,
         (e, res) => {
           if (e) {
@@ -96,16 +77,12 @@ let groups = (config) => {
     del: (groupName, callback) => {
       const remote = {service: 'groups', method: 'del'};
 
-      distribution[context.gid].comm.send(
-        [groupName, callback],
-        remote,
-        (e, res) => {
-          if (e) {
-            return callback(e, null);
-          }
-          return callback(null, res);
-        },
-      );
+      distribution[context.gid].comm.send([groupName], remote, (e, res) => {
+        if (e) {
+          return callback(e, null);
+        }
+        return callback(null, res);
+      });
     },
   };
 };
