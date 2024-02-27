@@ -1,6 +1,8 @@
 const id = require('../util/id');
-const {fork} = require('child_process');
 const distribution = global.distribution;
+const {spawn} = require('child_process');
+const wire = require('../util/wire');
+const path = require('path');
 
 let myState = {
   ID: '',
@@ -55,22 +57,20 @@ status.spawn = function (conf, callback) {
   conf.onStart = conf.onStart || function () {};
   conf.onStart = new Function(
     `
-      let old = ${node.onStart.toString()};
-      let rpc = ${distribution.util.wire
-        .createRPC(distribution.util.wire.toAsync(callback))
-        .toString()};
+      let old = ${conf.onStart.toString()};
+      let rpc = ${wire.createRPC(wire.toAsync(callback)).toString()};
 
       old();
       rpc(null, global.nodeConfig, ()=>{});
   `,
   );
 
-  fork.spawn(
-    'conf',
+  spawn(
+    'node',
     [
       path.join(__dirname, '../../distribution.js'),
       '--config',
-      serialize(conf),
+      global.distribution.util.serialize(conf),
     ],
     {
       detached: true,
@@ -79,6 +79,7 @@ status.spawn = function (conf, callback) {
 };
 
 status.stop = function (callback) {
+  callback = callback || function () {};
   callback(null, global.nodeConfig);
   process.exit(0);
 };
