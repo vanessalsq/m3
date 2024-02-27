@@ -1,10 +1,11 @@
+const {group} = require('yargs');
 const id = require('../util/id');
 const distribution = global.distribution;
 
 const groups = {};
 
 groups.get = function (groupName, callback) {
-  if (!groups[groupName]) {
+  if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
   }
@@ -12,7 +13,7 @@ groups.get = function (groupName, callback) {
 };
 
 groups.del = function (groupName, callback) {
-  if (!groups[groupName]) {
+  if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
   }
@@ -43,7 +44,7 @@ groups.put = function (groupName, groupData, callback) {
 };
 
 groups.add = function (groupName, node, callback) {
-  if (!groups[groupName]) {
+  if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
   }
@@ -55,7 +56,7 @@ groups.add = function (groupName, node, callback) {
 };
 
 groups.rem = function (groupName, nodeId, callback) {
-  if (!groups[groupName]) {
+  if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
   }
