@@ -9,22 +9,15 @@ let status = (config) => {
     get: (key, callback) => {
       const remote = {service: 'status', method: 'get'};
 
-      if (key === 'heapTotal' || key === 'heapUsed') {
+      if (key === 'heapTotal' || key === 'heapUsed' || key === 'count') {
         distribution[context.gid].comm.send([key], remote, (e, res) => {
-          console.log('status all callback', res);
-          if (e) {
-            callback(e, null);
-          } else {
-            console.log('res structure', res);
-          }
+          let sum = 0;
+          Object.keys(res).forEach((key) => {
+            sum += res[key];
+            console.log(key, sum);
+          });
+          callback(e, sum);
         });
-
-        const sum = 0;
-        Object.keys(res).forEach((key) => {
-          sum += res[key];
-          console.log(key, sum);
-        });
-        callback(null, sum);
       } else {
         distribution[context.gid].comm.send([key], remote, (e, res) => {
           callback(e, res);
