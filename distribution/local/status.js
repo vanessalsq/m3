@@ -1,55 +1,30 @@
 const id = require('../util/id');
-const distribution = global.distribution;
 const {spawn} = require('child_process');
 const wire = require('../util/wire');
 const path = require('path');
 const util = require('../util/util');
 
-let myState = {
-  ID: '',
-  NID: '',
-  SID: '',
-  msgCnt: 0,
-  routeMappings: {},
+const status = {};
+
+global.moreStatus = {
+  sid: id.getSID(global.nodeConfig),
+  nid: id.getNID(global.nodeConfig),
+  counts: 0,
 };
 
-global.myState = myState;
+status.get = function (configuration, callback) {
+  callback = callback || function () {};
 
-const node = global.nodeConfig;
-// init route mappings, ids, message counts, etc here
-const state = global.myState;
-state.NID = id.getNID(node);
-state.SID = id.getSID(node);
-
-let status = {};
-
-status.get = function (key, callback) {
-  switch (key) {
-    case 'nid':
-      callback(null, state.NID);
-      break;
-    case 'sid':
-      callback(null, state.SID);
-      break;
-    case 'ip':
-      callback(null, node.ip);
-      break;
-    case 'port':
-      callback(null, node.port);
-      break;
-    case 'counts':
-      callback(null, state.msgCnt);
-      break;
-    case 'heapTotal':
-      callback(null, process.memoryUsage().heapTotal);
-    case 'heapUsed':
-      if (process.memoryUsage().heapUsed) {
-        callback(null, process.memoryUsage().heapUsed);
-      } else {
-        callback(new Error('No Heap Used'), null);
-      }
-    default:
-      callback(new Error('Invalid key'));
+  if (configuration in global.nodeConfig) {
+    callback(null, global.nodeConfig[configuration]);
+  } else if (configuration in moreStatus) {
+    callback(null, moreStatus[configuration]);
+  } else if (configuration === 'heapTotal') {
+    callback(null, process.memoryUsage().heapTotal);
+  } else if (configuration === 'heapUsed') {
+    callback(null, process.memoryUsage().heapUsed);
+  } else {
+    callback(new Error('Status key not found'));
   }
 };
 
