@@ -3,7 +3,6 @@ const local = require('../local/local');
 
 let status = (config) => {
   let context = {};
-  let sum;
 
   context.gid = config.gid; // contains a property named gid
   return {
@@ -15,9 +14,11 @@ let status = (config) => {
         } else {
           if (key == 'heapTotal' || key == 'heapUsed') {
             res.forEach((ele) => {
+              let sum = 0;
               sum += ele;
+              console.log(ele);
             });
-            return callback(null, sum * 2);
+            return callback(null, sum * 8);
           } else {
             return callback(null, res);
           }
