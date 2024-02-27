@@ -18,7 +18,7 @@ let status = (config) => {
               sum += ele;
               console.log(ele);
             });
-            return callback(null, sum * 8);
+            return callback(null, sum);
           } else {
             return callback(null, res);
           }
