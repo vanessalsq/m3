@@ -8,22 +8,28 @@ let status = (config) => {
   return {
     get: (key, callback) => {
       const remote = {service: 'status', method: 'get'};
-      distribution[context.gid].comm.send([key], remote, (e, res) => {
-        if (e) {
-          callback(e, null);
-        } else {
-          if (key == 'heapTotal' || key == 'heapUsed') {
-            res.forEach((ele) => {
-              let sum = 0;
-              sum += ele;
-              console.log(ele);
-            });
-            callback(null, sum);
+
+      if (key === 'heapTotal' || key === 'heapUsed') {
+        distribution[context.gid].comm.send([key], remote, (e, res) => {
+          console.log('status all callback', res);
+          if (e) {
+            callback(e, null);
           } else {
-            callback(null, res);
+            console.log('res structure', res);
           }
-        }
-      });
+        });
+
+        const sum = 0;
+        Object.keys(res).forEach((key) => {
+          sum += res[key];
+          console.log(key, sum);
+        });
+        callback(null, sum);
+      } else {
+        distribution[context.gid].comm.send([key], remote, (e, res) => {
+          callback(e, res);
+        });
+      }
     },
     spawn: (nodeToSpawn, callback) => {
       local.status.spawn(nodeToSpawn, (e, v) => {
