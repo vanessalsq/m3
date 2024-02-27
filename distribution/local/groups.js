@@ -1,4 +1,5 @@
 const id = require('../util/id');
+const distribution = global.distribution;
 
 const groups = {};
 
@@ -21,7 +22,23 @@ groups.del = function (groupName, callback) {
 };
 
 groups.put = function (groupName, groupData, callback) {
+  distribution[groupName] = {};
+  distribution[groupName].comm = require('../all/comm')({gid: groupName});
+  distribution[groupName].gossip = require('../all/gossip')({
+    gid: groupName,
+  });
+  distribution[groupName].groups = require('../all/groups')({
+    gid: groupName,
+  });
+  distribution[groupName].routes = require('../all/routes')({
+    gid: groupName,
+  });
+  distribution[groupName].status = require('../all/status')({
+    gid: groupName,
+  });
+
   groups[groupName] = groupData;
+
   return callback(null, groups[groupName]);
 };
 
