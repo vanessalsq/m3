@@ -7,7 +7,7 @@ groups.get = function (groupName, callback) {
     const err = new Error('Group not found');
     return callback(err);
   }
-  return callback(null, groups[groupName]);
+  return callback(null, groups[groupName]); // return the group of nodes
 };
 
 groups.del = function (groupName, callback) {
@@ -22,11 +22,6 @@ groups.del = function (groupName, callback) {
 
 groups.put = function (groupName, groupData, callback) {
   groups[groupName] = groupData;
-
-  if (!distribution[groupName]) {
-    distribution.addGroup(groupName);
-  }
-
   return callback(null, groups[groupName]);
 };
 

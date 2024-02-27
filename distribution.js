@@ -45,27 +45,6 @@ const distribution = {
   all: {},
 };
 
-// Function to dynamically add groups to the distribution object
-distribution.addGroup = function (gname) {
-  if (!(gname in this)) {
-    // Dynamically require service factory functions as needed
-    const comm = require('./distribution/all/comm.js');
-    const groups = require('./distribution/all/groups.js');
-    const status = require('./distribution/all/status.js');
-    const routes = require('./distribution/all/routes.js');
-    const gossip = require('./distribution/all/gossip.js');
-
-    // Instantiate services for the new group
-    this[gname] = {
-      comm: comm(), // any param?
-      groups: groups(),
-      status: status(),
-      routes: routes(),
-      gossip: gossip(),
-    };
-  }
-};
-
 global.distribution = distribution;
 global.myState = global.myState || require('./distribution/local/local');
 
@@ -75,3 +54,7 @@ module.exports = distribution;
 if (require.main === module) {
   distribution.node.start(global.nodeConfig.onStart);
 }
+
+// global.distribution['browncs'] = {};
+// global.distribution['browncs'].groups = require('path to groups')(gid)
+//when you put, you have the GID, brownCS is also gid

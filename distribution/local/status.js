@@ -1,7 +1,6 @@
 const id = require('../util/id');
 const {fork} = require('child_process');
-const serialization = require('../util/serialization');
-const distribution = require('../../distribution');
+const distribution = global.distribution;
 
 let myState = {
   ID: '',
@@ -41,7 +40,11 @@ status.get = function (key, callback) {
     case 'heapTotal':
       callback(null, process.memoryUsage().heapTotal);
     case 'heapUsed':
-      callback(null, process.memoryUsage().heapUsed);
+      if (process.memoryUsage().heapUsed) {
+        callback(null, process.memoryUsage().heapUsed);
+      } else {
+        callback(new Error('No Heap Used'), null);
+      }
     default:
       callback(new Error('Invalid key'));
   }
@@ -49,29 +52,35 @@ status.get = function (key, callback) {
 
 status.spawn = function (conf, callback) {
   // Create RPC from callback
-  const rpc = distribution.util.wire.createRPC(callback); //onStart??? or callback
+  conf.onStart = conf.onStart || function () {};
+  conf.onStart = new Function(
+    `
+      let old = ${node.onStart.toString()};
+      let rpc = ${distribution.util.wire
+        .createRPC(distribution.util.wire.toAsync(callback))
+        .toString()};
 
-  const combined = {...conf, onStart: rpc};
+      old();
+      rpc(null, global.nodeConfig, ()=>{});
+  `,
+  );
 
-  const serialized = JSON.stringify(combined);
-
-  // launch child process
-  const child = fork('distribution.js', [serialized]);
-
-  child.on('message', (message) => {
-    if (message == 'booted') {
-      callback(null, nodeConfig);
-    }
-  });
+  fork.spawn(
+    'conf',
+    [
+      path.join(__dirname, '../../distribution.js'),
+      '--config',
+      serialize(conf),
+    ],
+    {
+      detached: true,
+    },
+  );
 };
 
 status.stop = function (callback) {
-  callback(null, 'stopping the server...');
-  setTimeout(() => {
-    // Stop the server
-    console.log('stopping the server...');
-    //server.close ?
-  }, 1000);
+  callback(null, distribution.nodeConfig);
+  process.exit(0);
 };
 
 module.exports = status;
