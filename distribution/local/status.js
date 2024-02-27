@@ -3,6 +3,7 @@ const distribution = global.distribution;
 const {spawn} = require('child_process');
 const wire = require('../util/wire');
 const path = require('path');
+const util = require('../util/util');
 
 let myState = {
   ID: '',
@@ -70,7 +71,7 @@ status.spawn = function (conf, callback) {
     [
       path.join(__dirname, '../../distribution.js'),
       '--config',
-      global.distribution.util.serialize(conf),
+      util.serialize(conf),
     ],
     {
       detached: true,
@@ -81,7 +82,11 @@ status.spawn = function (conf, callback) {
 status.stop = function (callback) {
   callback = callback || function () {};
   callback(null, global.nodeConfig);
-  process.exit(0);
+  global.server.close();
+
+  setTimeout(() => {
+    process.exit(0);
+  }, 1000);
 };
 
 module.exports = status;
