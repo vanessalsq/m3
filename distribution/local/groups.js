@@ -2,7 +2,7 @@ const id = require('../util/id');
 
 const groups = {};
 
-groups.get = function (groupName, callback) {
+groups.get = function(groupName, callback) {
   if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
@@ -10,7 +10,7 @@ groups.get = function (groupName, callback) {
   return callback(null, groups[groupName]); // return the group of nodes
 };
 
-groups.del = function (groupName, callback) {
+groups.del = function(groupName, callback) {
   if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
@@ -20,13 +20,13 @@ groups.del = function (groupName, callback) {
   return callback(null, groupData);
 };
 
-groups.put = function (groupName, groupData, callback) {
+groups.put = function(groupName, groupData, callback) {
   groups[groupName] = groupData;
 
   return callback(null, groups[groupName]);
 };
 
-groups.add = function (groupName, node, callback) {
+groups.add = function(groupName, node, callback) {
   if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);
@@ -38,7 +38,7 @@ groups.add = function (groupName, node, callback) {
   return callback(null, groups[groupName]);
 };
 
-groups.rem = function (groupName, nodeId, callback) {
+groups.rem = function(groupName, nodeId, callback) {
   if (!groups.hasOwnProperty(groupName)) {
     const err = new Error('Group not found');
     return callback(err);

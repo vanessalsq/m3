@@ -12,8 +12,8 @@ global.moreStatus = {
   counts: 0,
 };
 
-status.get = function (configuration, callback) {
-  callback = callback || function () {};
+status.get = function(configuration, callback) {
+  callback = callback || function() {};
 
   if (configuration in global.nodeConfig) {
     callback(null, global.nodeConfig[configuration]);
@@ -28,11 +28,11 @@ status.get = function (configuration, callback) {
   }
 };
 
-status.spawn = function (conf, callback) {
+status.spawn = function(conf, callback) {
   // Create RPC from callback
-  conf.onStart = conf.onStart || function () {};
+  conf.onStart = conf.onStart || function() {};
   conf.onStart = new Function(
-    `
+      `
       let old = ${conf.onStart.toString()};
       let rpc = ${wire.createRPC(wire.toAsync(callback)).toString()};
 
@@ -42,20 +42,20 @@ status.spawn = function (conf, callback) {
   );
 
   spawn(
-    'node',
-    [
-      path.join(__dirname, '../../distribution.js'),
-      '--config',
-      util.serialize(conf),
-    ],
-    {
-      detached: true,
-    },
+      'node',
+      [
+        path.join(__dirname, '../../distribution.js'),
+        '--config',
+        util.serialize(conf),
+      ],
+      {
+        detached: true,
+      },
   );
 };
 
-status.stop = function (callback) {
-  callback = callback || function () {};
+status.stop = function(callback) {
+  callback = callback || function() {};
   callback(null, global.nodeConfig);
   global.server.close();
 

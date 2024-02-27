@@ -7,10 +7,10 @@ let gossip = (config) => {
       /** uses context **/
     },
     at: () => {
-      /**uses context**/
+      /** uses context**/
     },
     del: () => {
-      /**uses context**/
+      /** uses context**/
     },
   };
 };

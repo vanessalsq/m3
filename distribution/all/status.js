@@ -32,15 +32,15 @@ let status = (config) => {
           console.log(v, 'is succesffully spawned');
           const remote = {service: 'groups', method: 'add', node: v};
           distribution[context.gid].comm.send(
-            [context.gid, nodeToSpawn],
-            remote,
-            (e, res) => {
-              if (e) {
-                callback(e, null);
-              } else {
-                callback(null, res);
-              }
-            },
+              [context.gid, nodeToSpawn],
+              remote,
+              (e, res) => {
+                if (e) {
+                  callback(e, null);
+                } else {
+                  callback(null, res);
+                }
+              },
           );
         }
       });

@@ -32,9 +32,9 @@ let groups = (config) => {
           return callback(e, null);
         } else {
           distribution[context.gid].comm.send(
-            [groupName, groupData],
-            remote,
-            callback,
+              [groupName, groupData],
+              remote,
+              callback,
           );
         }
       });
@@ -56,9 +56,9 @@ let groups = (config) => {
           return callback(e, null);
         } else {
           distribution[context.gid].comm.send(
-            [groupName, node],
-            remote,
-            callback,
+              [groupName, node],
+              remote,
+              callback,
           );
         }
       });
@@ -74,9 +74,9 @@ let groups = (config) => {
           return callback(e, null);
         } else {
           distribution[context.gid].comm.send(
-            [groupName, node],
-            remote,
-            callback,
+              [groupName, node],
+              remote,
+              callback,
           );
         }
       });

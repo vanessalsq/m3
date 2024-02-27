@@ -17,20 +17,21 @@ let comm = (config) => {
         // Send a message to each node in the group
         Object.keys(nodes).forEach((nodeId) => {
           local.comm.send(
-            message,
-            {node: nodes[nodeId], ...remote},
-            (err, response) => {
-              if (err) {
-                errors[nodeId] = err;
-              } else {
-                responses[nodeId] = response;
-              }
+              message,
+              {node: nodes[nodeId], ...remote},
+              (err, response) => {
+                if (err) {
+                  errors[nodeId] = err;
+                } else {
+                  responses[nodeId] = response;
+                }
 
-              completedCalls++;
-              if (completedCalls === Object.keys(nodes).length) {
-                callback(errors, responses);
-              }
-            },
+                completedCalls++;
+                if (completedCalls === Object.keys(nodes).length) {
+                  console.log('completed', errors, responses);
+                  callback(errors, responses);
+                }
+              },
           );
         });
       });
