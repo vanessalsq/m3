@@ -79,7 +79,7 @@ status.spawn = function (conf, callback) {
 };
 
 status.stop = function (callback) {
-  callback(null, distribution.nodeConfig);
+  callback(null, global.nodeConfig);
   process.exit(0);
 };
 
